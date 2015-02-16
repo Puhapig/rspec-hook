@@ -1,0 +1,17 @@
+#!/bin/bash
+
+#Run rake spec tests to check module functionality
+echo "Running 'bundle exec rake spec'" 
+bundle exec rake spec 2>/dev/null | grep -A 1 'Finished in '
+SPEC_STATUS=${PIPESTATUS[0]}
+
+#Run rake lint tests to check for correct puppet style
+echo -e "\nRunning 'bundle exec rake lint'"
+bundle exec rake lint 2>/dev/null
+LINT_STATUS=$?
+
+#Abort the commit if either test doesn't return successfully
+if [ $SPEC_STATUS != 0 ] || [ $LINT_STATUS != 0 ] ; then
+	echo -e "\nStopping commit because of failed tests. Please ensure that 'bundle exec rake spec' and 'bundle exec rake lint' both return without failures before continuing."
+	exit 1
+fi
